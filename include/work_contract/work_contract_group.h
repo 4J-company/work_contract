@@ -2,8 +2,8 @@
 
 #include "./work_contract_id.h"
 #include "./work_contract_token.h"
+#include "./signal_tree.h"
 
-#include <include/signal_tree.h>
 #include <include/synchronization_mode.h>
 #include <include/non_movable.h>
 #include <include/non_copyable.h>
