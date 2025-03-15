@@ -17,6 +17,12 @@
 #include <ratio>
 #include <functional>
 
+#ifdef _WIN32
+#include <processthreadsapi.h>
+#else
+#include <pthread.h>
+#endif
+
 #include <include/signal_tree.h>
 
 // it might look a bit odd to hard code the cpus to use in the benchmark
@@ -35,13 +41,19 @@ int mainCpu = 0;
 //==============================================================================
 bool set_cpu_affinity
 (
-    int value
+  int value
 )
 {
-    cpu_set_t cpuSet;
-    CPU_ZERO(&cpuSet);
-    CPU_SET(value, &cpuSet);
-    return (pthread_setaffinity_np(pthread_self(), sizeof(cpuSet), &cpuSet) == 0);
+#ifdef _WIN32
+  DWORD_PTR mask = 1 << value;
+  HANDLE thread = GetCurrentThread();
+  return (SetThreadAffinityMask(thread, mask) != 0);
+#else
+  cpu_set_t cpuSet;
+  CPU_ZERO(&cpuSet);
+  CPU_SET(value, &cpuSet);
+  return (pthread_setaffinity_np(pthread_self(), sizeof(cpuSet), &cpuSet) == 0);
+#endif
 }
 
 

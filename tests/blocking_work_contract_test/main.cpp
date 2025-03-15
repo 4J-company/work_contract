@@ -1,5 +1,5 @@
 
-#include <library/work_contract.h>
+#include <work_contract/work_contract.h>
 #include <iostream>
 #include <thread>
 
@@ -17,7 +17,7 @@ int blocking_execute_after_scheduled
                     workContractGroup.execute_next_contract();
             });
     std::atomic<bool> executed{false};
-    auto workContract = workContractGroup.create_contract([&](auto & token){std::cout << "contract executed\n"; executed = true;});
+    bcpp::blocking_work_contract workContract = workContractGroup.create_contract([&](auto& token) {std::cout << "contract executed\n"; executed = true; });
     workContract.schedule();
     while (!executed)
         ;
@@ -45,7 +45,7 @@ int main
             });
 
     std::atomic<bool> executed{false};
-    auto workContract = workContractGroup.create_contract([&](auto & token){std::cout << "executed\n"; executed = true;});
+    bcpp::blocking_work_contract workContract = workContractGroup.create_contract([&](auto & token){std::cout << "executed\n"; executed = true;});
 
     for (auto i = 0; i < 1000; ++i)
     {

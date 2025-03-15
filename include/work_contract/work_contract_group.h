@@ -82,24 +82,28 @@ namespace bcpp::implementation
 
         ~work_contract_group();
 
+        template<work_contract_callable WorkFunc>
         work_contract_type create_contract
         (
-            work_contract_callable auto &&,
+            WorkFunc &&,
             work_contract_type::initial_state = work_contract_type::initial_state::unscheduled
         );
 
+        template <bcpp::implementation::work_contract_callable WorkFunc, std::invocable ReleaseFunc>
         work_contract_type create_contract
         (
-            work_contract_callable auto &&,
-            std::invocable auto &&,
+            WorkFunc &&,
+            ReleaseFunc &&,
             work_contract_type::initial_state = work_contract_type::initial_state::unscheduled
         );
 
+        template <bcpp::implementation::work_contract_callable WorkFunc, std::invocable ReleaseFunc, typename ExceptionFunct>
+            requires std::invocable<ExceptionFunct, bcpp::implementation::work_contract_token<T>&, std::exception_ptr>
         work_contract_type create_contract
         (
-            work_contract_callable auto &&,
-            std::invocable auto &&,
-            std::invocable<work_contract_token<T> &, std::exception_ptr> auto &&,
+            WorkFunc &&,
+            ReleaseFunc &&,
+            ExceptionFunct &&,
             work_contract_type::initial_state = work_contract_type::initial_state::unscheduled
         );
 
@@ -178,7 +182,7 @@ namespace bcpp::implementation
         (
             work_contract_id,
             bool
-        );
+        ) {}
 
         void erase_contract
         (
@@ -318,9 +322,10 @@ namespace bcpp
 
 //=============================================================================
 template <bcpp::synchronization_mode T>
+template <bcpp::implementation::work_contract_callable WorkFunc>
 inline auto bcpp::implementation::work_contract_group<T>::create_contract
 (
-    work_contract_callable auto && workFunction,
+    WorkFunc && workFunction,
     work_contract_type::initial_state initialState
 ) -> work_contract_type
 {
@@ -330,10 +335,11 @@ inline auto bcpp::implementation::work_contract_group<T>::create_contract
 
 //=============================================================================
 template <bcpp::synchronization_mode T>
+template <bcpp::implementation::work_contract_callable WorkFunc, std::invocable ReleaseFunc>
 inline auto bcpp::implementation::work_contract_group<T>::create_contract
 (
-    work_contract_callable auto && workFunction,
-    std::invocable auto && releaseFunction,
+    WorkFunc && workFunction,
+    ReleaseFunc && releaseFunction,
     work_contract_type::initial_state initialState
 ) -> work_contract_type
 {    
@@ -343,11 +349,13 @@ inline auto bcpp::implementation::work_contract_group<T>::create_contract
 
 //=============================================================================
 template <bcpp::synchronization_mode T>
+template <bcpp::implementation::work_contract_callable WorkFunc, std::invocable ReleaseFunc, typename ExceptionFunct>
+    requires std::invocable<ExceptionFunct, bcpp::implementation::work_contract_token<T>&, std::exception_ptr>
 inline auto bcpp::implementation::work_contract_group<T>::create_contract
 (
-    work_contract_callable auto && workFunction,
-    std::invocable auto && releaseFunction,
-    std::invocable<work_contract_token<T> &, std::exception_ptr> auto && exceptionFunction,
+    WorkFunc && workFunction,
+    ReleaseFunc && releaseFunction,
+    ExceptionFunct && exceptionFunction,
     work_contract_type::initial_state initialState
 ) -> work_contract_type
 {

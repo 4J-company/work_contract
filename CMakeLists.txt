@@ -22,6 +22,10 @@ add_library(work_contract src/work_contract_group.cpp)
 target_link_libraries(work_contract PUBLIC ${WORK_CONTRACT_DEPENDENCIES})
 target_include_directories(work_contract PUBLIC ./include)
 
+if (MSVC)
+    target_compile_options(work_contract PRIVATE /EHsc)
+endif()
+
 if (WORK_CONTRACT_BUILD_EXAMPLES)
   add_subdirectory(examples)
 endif()
